@@ -1,119 +1,144 @@
 # Missing Data & Statistical Inference
 
-A simulation-based study of how missing-data mechanisms and missing-data handling methods affect regression estimation and statistical inference.
+### Comparing regression inference under MCAR, MAR, and MNAR
 
-## Project question
+This project uses a controlled simulation to study a practical statistical question:
 
-**Within a given missingness mechanism, how do different methods for handling missing data change the estimated regression relationship, its uncertainty, and the resulting inference?**
+> **When the response variable contains missing values, how do different missing-data handling methods affect regression estimates and their uncertainty?**
 
-The project treats **MCAR, MAR and MNAR as experimental conditions** and compares seven handling approaches within each condition.
+The focus is on **comparing methods within each missingness mechanism** rather than treating MCAR, MAR, and MNAR themselves as methods to be ranked.
 
-## Model
+![Beta1 estimates by method and missingness mechanism](figures/beta1_estimates_by_mechanism.svg)
 
-The complete data were generated from
+---
+
+## Project overview
+
+A complete dataset of 100 observations is generated from the multiple linear regression model
 
 $$
 Y = 5 + 2X_1 - 1.5X_2 + X_3 + \epsilon
 $$
 
-with true parameters
+so the true regression coefficients are
 
 $$
-\beta_0 = 5, \qquad \beta_1 = 2, \qquad \beta_2 = -1.5, \qquad \beta_3 = 1.
+\beta_0 = 5, \qquad
+\beta_1 = 2, \qquad
+\beta_2 = -1.5, \qquad
+\beta_3 = 1.
 $$
 
-Only the response variable $Y$ was made incomplete; $X_1$, $X_2$ and $X_3$ remained fully observed.
+Only **$Y$ is made incomplete**. The predictors $X_1$, $X_2$, and $X_3$ remain fully observed.
 
-## Missingness mechanisms
+Three missingness mechanisms are then imposed on the same underlying complete dataset:
 
-- **MCAR:** every observation was given the same missingness probability.
-- **MAR:** missingness probability depended on the observed predictor $X_1$.
-- **MNAR:** missingness probability depended directly on the original outcome $Y$.
+- **MCAR — Missing Completely At Random:** missingness is generated independently of the variables.
+- **MAR — Missing At Random:** missingness depends on observed information, here $X_1$.
+- **MNAR — Missing Not At Random:** missingness depends on the underlying outcome $Y$ itself.
 
-The same incomplete dataset for a given mechanism was supplied to all seven methods.
+For each mechanism, the **same incomplete dataset** is given to all seven methods so that the methods are compared under the same missing-data condition.
 
-## Methods compared
+---
 
-1. Complete-case analysis
-2. Mean imputation
-3. Hot-deck imputation
-4. Regression imputation
-5. Stochastic regression imputation
-6. MICE using predictive mean matching (PMM)
-7. EM algorithm
+## Methods
 
-## Evaluation
+The project compares seven approaches:
 
-The primary parameter of interest is $\beta_1$, with true value 2.
+| Method | Basic idea |
+|---|---|
+| **Complete Case** | Remove observations where $Y$ is missing and fit the regression to the remaining cases. |
+| **Mean Imputation** | Replace missing $Y$ values with the observed mean of $Y$. |
+| **Hot-Deck** | Use a similar observed case as a donor and copy its observed $Y$. |
+| **Regression Imputation** | Predict missing $Y$ from $X_1,X_2,X_3$ using a regression model. |
+| **Stochastic Regression** | Add sampled regression residuals to the predicted missing values. |
+| **MICE / PMM** | Generate multiple imputations using predictive mean matching and pool the resulting estimates. |
+| **EM** | Estimate the regression parameters iteratively using the Expectation-Maximization framework. |
 
-The analysis reports:
+---
 
-- point estimate $\hat\beta_1$
-- bias $\hat\beta_1 - 2$
-- bootstrap standard error
-- bootstrap 95% confidence interval
+## What is evaluated?
 
-MICE uses multiple imputations and Rubin's rules for pooled inference.
+The main parameter of interest is **$\beta_1$**, whose true value is 2.
 
-## Main findings from the simulated dataset
+For every method and mechanism, the project examines:
 
-The strongest and most consistent numerical pattern is the effect of **mean imputation**. Its $\beta_1$ estimates were substantially below 2 under all three mechanisms:
+- **Point estimate:** $\hat\beta_1$
+- **Bias:** $\hat\beta_1 - \beta_1$
+- **Bootstrap standard error**
+- **95% confidence interval**
 
-| Mechanism | Mean-imputation $\hat\beta_1$ | Bias |
+For MICE, inference is pooled across multiple completed datasets using **Rubin's rules**, combining within-imputation and between-imputation variability.
+
+---
+
+## Results
+
+The simulation shows clear differences in how the handling methods affect the estimated coefficient.
+
+For example, the estimated $\beta_1$ from mean imputation was:
+
+| Mechanism | $\hat\beta_1$ | Bias |
 |---|---:|---:|
 | MCAR | 1.089 | -0.911 |
 | MAR | 1.307 | -0.693 |
 | MNAR | 1.413 | -0.587 |
 
-Within the same MCAR, MAR and MNAR datasets, the other methods produced estimates clustered much closer to the true value in this particular simulation.
-
-For example, under MAR, the MICE pooled estimate was
+Under MAR, the MICE pooled result was
 
 $$
 \hat\beta_1 = 1.797,
+\qquad SE = 0.094,
 $$
 
-with pooled standard error
+with a 95% confidence interval of
 
 $$
-SE = 0.094,
+(1.612,\;1.982).
 $$
 
-and 95% interval
-
-$$
-(1.612,\ 1.982).
-$$
-
-Under MNAR, MICE produced
+Under MNAR, the corresponding MICE result was
 
 $$
 \hat\beta_1 = 1.722,
+\qquad SE = 0.108,
 $$
 
-with pooled standard error
+with a 95% confidence interval of
 
 $$
-SE = 0.108,
+(1.510,\;1.933).
 $$
 
-and 95% interval
+The repository contains the complete method-by-mechanism results so the estimates, uncertainty, and bias can be examined directly rather than relying on a single summary statistic.
 
-$$
-(1.510,\ 1.933).
-$$
+---
 
-These are results for **one simulated dataset**, not universal rankings of missing-data methods.
+## Visualisations
 
-## Important scope note
+The project includes:
 
-The project stops at bootstrap inference. It does **not** perform a repeated Monte Carlo study, so it does not estimate long-run empirical bias or confidence-interval coverage across independent datasets.
+**Coefficient estimates with 95% confidence intervals**
 
-The MICE implementation is intentionally simplified because only one variable ($Y$) is incomplete. MNAR is treated as a stress test; solving MNAR generally requires additional assumptions or sensitivity analysis.
+- MCAR
+- MAR
+- MNAR
+
+**Absolute bias plots**
+
+- MCAR
+- MAR
+- MNAR
+
+**Overall comparison**
+
+- $\beta_1$ estimates for all seven methods across MCAR, MAR, and MNAR
+
+---
 
 ## Repository structure
 
-```text
+\`\`\`text
 missing-data-stat-inference/
 ├── README.md
 ├── requirements.txt
@@ -124,9 +149,26 @@ missing-data-stat-inference/
 │   ├── Missing_Data_Statistical_Inference_Final_Report.pdf
 │   └── Missing_Data_Statistical_Inference_Final_Report.tex
 ├── figures/
+│   ├── beta1_estimates_by_mechanism.svg
+│   ├── beta1_ci_mcar.svg
+│   ├── beta1_ci_mar.svg
+│   ├── beta1_ci_mnar.svg
+│   ├── beta1_absolute_bias_mcar.svg
+│   ├── beta1_absolute_bias_mar.svg
+│   └── beta1_absolute_bias_mnar.svg
 └── results/
-```
+    ├── master_results.csv
+    └── mice_details.csv
+\`\`\`
 
-## Tools
+---
 
-Python • NumPy • pandas • SciPy • statsmodels • Matplotlib • Jupyter • LaTeX
+## Reproducibility
+
+The analysis is implemented in **Python** using:
+
+**NumPy · pandas · SciPy · statsmodels · Matplotlib · Jupyter**
+
+The complete notebook contains the simulation setup, missingness generation, implementation of the seven methods, bootstrap inference, result storage, and visualisations.
+
+The accompanying PDF report documents the methodology, mathematical framework, results, and interpretation.
