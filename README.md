@@ -8,6 +8,8 @@ This project uses a controlled simulation to study a practical statistical quest
 
 The focus is on **comparing methods within each missingness mechanism** rather than treating MCAR, MAR, and MNAR themselves as methods to be ranked.
 
+> **Newer version:** an extended study (200 observations, missing values in two variables, a helper variable, eight methods, 300 simulated repetitions) is in [`extended_study/`](extended_study/). See its [report](extended_study/report/Missing_Data_Statistical_Inference_Report.pdf). The description below is the original study.
+
 ![Beta1 estimates by method and missingness mechanism](figures/beta1_estimates_by_mechanism.png)
 
 ---
