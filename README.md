@@ -1,175 +1,80 @@
-# Missing Data & Statistical Inference
+# Missing Data and Statistical Inference
 
-### Comparing regression inference under MCAR, MAR, and MNAR
+A simulation study that compares **eight ways of handling missing values** in a regression, separately for the three kinds of missingness (**MCAR, MAR and MNAR**).
 
-This project uses a controlled simulation to study a practical statistical question:
+The data are made up from a model where the true answer is known (`Y = 5 + 2·X1 − 1.5·X2 + X3 + error`, so the slope we care about is **β₁ = 2**). About 20% of the values of `Y` and `X1` are then deleted, and each method tries to recover the right answer *and* a trustworthy 95% confidence interval.
 
-> **When the response variable contains missing values, how do different missing-data handling methods affect regression estimates and their uncertainty?**
 
-The focus is on **comparing methods within each missingness mechanism** rather than treating MCAR, MAR, and MNAR themselves as methods to be ranked.
+![Bias and coverage of every method under every mechanism](figures/fig8_at_a_glance.png)
 
-> **Newer version:** an extended study (200 observations, missing values in two variables, a helper variable, eight methods, 300 simulated repetitions) is in [`extended_study/`](extended_study/). See its [report](extended_study/report/Missing_Data_Statistical_Inference_Report.pdf). The description below is the original study.
+**Read the full report here:** [`report/Missing_Data_Statistical_Inference_Report.pdf`](report/Missing_Data_Statistical_Inference_Report.pdf)
 
-![Beta1 estimates by method and missingness mechanism](figures/beta1_estimates_by_mechanism.png)
+## The question
 
----
+> Within each type of missingness, which way of handling the missing values gives the most accurate estimate and the most honest confidence interval?
 
-## Project overview
+## The eight methods
 
-A complete dataset of 100 observations is generated from the multiple linear regression model
+Complete-case analysis · Mean imputation · Hot-deck · Regression imputation · Stochastic regression · MICE (normal) · MICE (PMM) · EM algorithm
 
-$$
-Y = 5 + 2X_1 - 1.5X_2 + X_3 + \epsilon
-$$
+## Main findings (300 simulated datasets per mechanism)
 
-so the true regression coefficients are
+| Missingness | What works | What to avoid |
+|---|---|---|
+| **MCAR** (pure chance) | Complete case is fine. MICE or EM are slightly more precise. | Mean imputation and single imputation |
+| **MAR** (depends on an observed variable) | **EM or MICE (normal)**, using the extra observed variable | Complete case (biased) and single imputation |
+| **MNAR** (depends on the missing value) | Nothing is reliable. Report a sensitivity analysis. | Claiming any method "fixes" MNAR |
 
-$$
-\beta_0 = 5, \qquad
-\beta_1 = 2, \qquad
-\beta_2 = -1.5, \qquad
-\beta_3 = 1.
-$$
+In every case:
 
-Only **$Y$ is made incomplete**. The predictors $X_1$, $X_2$, and $X_3$ remain fully observed.
+* **Mean imputation is the worst method** everywhere.
+* **Hot-deck, regression imputation and stochastic regression give confidence intervals that are too narrow**, because they treat made-up values as real data (their reported standard errors are only about 70–85% of the true spread).
+* **MICE and EM report honest uncertainty** when the data are MCAR or MAR (coverage of the 95% interval is about 95%).
 
-Three missingness mechanisms are then imposed on the same underlying complete dataset:
+## What is in this repository
 
-- **MCAR — Missing Completely At Random:** missingness is generated independently of the variables.
-- **MAR — Missing At Random:** missingness depends on observed information, here $X_1$.
-- **MNAR — Missing Not at Random:** missingness depends on the underlying outcome $Y$ itself.
-
-For each mechanism, the **same incomplete dataset** is given to all seven methods so that the methods are compared under the same missing-data condition.
-
----
-
-## Methods
-
-The project compares seven approaches:
-
-| Method | Basic idea |
-|---|---|
-| **Complete Case** | Remove observations where $Y$ is missing and fit the regression to the remaining cases. |
-| **Mean Imputation** | Replace missing $Y$ values with the observed mean of $Y$. |
-| **Hot-Deck** | Use a similar observed case as a donor and copy its observed $Y$. |
-| **Regression Imputation** | Predict missing $Y$ from $X_1,X_2,X_3$ using a regression model. |
-| **Stochastic Regression** | Add sampled regression residuals to the predicted missing values. |
-| **MICE / PMM** | Generate multiple imputations using predictive mean matching and pool the resulting estimates. |
-| **EM** | Estimate the regression parameters iteratively using the Expectation-Maximization framework. |
-
----
-
-## What is evaluated?
-
-The main parameter of interest is **$\beta_1$**, whose true value is 2.
-
-For every method and mechanism, the project examines:
-
-- **Point estimate:** $\hat\beta_1$
-- **Bias:** $\hat\beta_1 - \beta_1$
-- **Bootstrap standard error**
-- **95% confidence interval**
-
-For MICE, inference is pooled across multiple completed datasets using **Rubin's rules**, combining within-imputation and between-imputation variability.
-
----
-
-## Results
-
-The simulation shows clear differences in how the handling methods affect the estimated coefficient.
-
-For example, the estimated $\beta_1$ from mean imputation was:
-
-| Mechanism | $\hat\beta_1$ | Bias |
-|---|---:|---:|
-| MCAR | 1.089 | -0.911 |
-| MAR | 1.307 | -0.693 |
-| MNAR | 1.413 | -0.587 |
-
-Under MAR, the MICE pooled result was
-
-$$
-\hat\beta_1 = 1.797,
-\qquad SE = 0.094,
-$$
-
-with a 95% confidence interval of
-
-$$
-(1.612,\;1.982).
-$$
-
-Under MNAR, the corresponding MICE result was
-
-$$
-\hat\beta_1 = 1.722,
-\qquad SE = 0.108,
-$$
-
-with a 95% confidence interval of
-
-$$
-(1.510,\;1.933).
-$$
-
-The complete method-by-mechanism results are available in the repository.
-
----
-
-## Files
-
-| Resource | Description |
-|---|---|
-| [Main notebook](notebooks/missing_data_statistical_inference.ipynb) | Complete simulation, missingness setup, seven methods, bootstrap analysis, results and visualisations |
-| [Final report (PDF)](report/Missing_Data_Statistical_Inference_Final_Report%20%285%29.pdf) | Full project report |
-| [LaTeX source](report/Missing_Data_Statistical_Inference_Final_Report.tex) | Source used to prepare the report |
-| [Master results](results/master_results.csv) | Method-by-mechanism estimates, standard errors, confidence intervals and bias |
-| [MICE results](results/mice_details.csv) | Individual imputation estimates and pooled MICE quantities |
-
-### Figures
-
-[Overall $\beta_1$ comparison](figures/beta1_estimates_by_mechanism.png) ·
-[MCAR confidence intervals](figures/beta1_ci_mcar.png) ·
-[MAR confidence intervals](figures/beta1_ci_mar.png) ·
-[MNAR confidence intervals](figures/beta1_ci_mnar.png)
-
-[MCAR absolute bias](figures/beta1_absolute_bias_mcar.png) ·
-[MAR absolute bias](figures/beta1_absolute_bias_mar.png) ·
-[MNAR absolute bias](figures/beta1_absolute_bias_mnar.png)
-
----
-
-## Repository structure
-
-\`\`\`text
-missing-data-stat-inference/
-├── README.md
-├── requirements.txt
-├── .gitignore
-├── notebooks/
-│   └── missing_data_statistical_inference.ipynb
+```
 ├── report/
-│   ├── Missing_Data_Statistical_Inference_Final_Report (5).pdf
-│   └── Missing_Data_Statistical_Inference_Final_Report.tex
-├── figures/
-│   ├── beta1_estimates_by_mechanism.png
-│   ├── beta1_ci_mcar.png
-│   ├── beta1_ci_mar.png
-│   ├── beta1_ci_mnar.png
-│   ├── beta1_absolute_bias_mcar.png
-│   ├── beta1_absolute_bias_mar.png
-│   └── beta1_absolute_bias_mnar.png
-└── results/
-    ├── master_results.csv
-    └── mice_details.csv
-\`\`\`
+│   └── Missing_Data_Statistical_Inference_Report.pdf   the full written report (21 pages)
+├── notebook/
+│   └── missing_data_simulation.ipynb                   all the code, step by step, with outputs
+├── results/
+│   ├── part_a_results.csv                              Part A: one dataset, every method
+│   ├── simulation_summary.csv                          Part B: summary of the 300 repetitions
+│   └── simulation_all_repetitions.csv                  Part B: every single run
+├── figures/                                            the figures used in the report
+├── report_build/                                       scripts that redraw the figures and rebuild the PDF
+├── requirements.txt
+└── README.md
+```
 
----
+## How the study is organised
 
-## Reproducibility
+* **Part A – one worked example.** One dataset, analysed step by step, with bootstrap standard errors.
+* **Part B – simulation study.** The whole experiment is repeated 300 times with fresh data, so we can see how each method behaves *on average* (bias, spread, RMSE, and how often the 95% interval contains the truth).
 
-The analysis is implemented in **Python** using:
+All comparisons are made **within** each mechanism.
 
-**NumPy · pandas · SciPy · statsmodels · Matplotlib · Jupyter**
+## How to run the notebook
 
-The complete notebook contains the simulation setup, missingness generation, implementation of the seven methods, bootstrap inference, result storage, and visualisations.
+1. Install the requirements: `pip install -r requirements.txt`
+2. Open `notebook/missing_data_simulation.ipynb` in Jupyter (or upload it to Google Colab) and choose **Run all**.
+
+The full run takes about **8 minutes**. For a quick test, set `N_REPS = 50` in the settings block near the top (Step 1b). Every code block starts from its own random seed, so any block can be re-run on its own and gives the same answer. The notebook also writes the three CSV files listed above.
+
+## How to rebuild the report
+
+```
+python report_build/make_figures.py    # redraws the figures from the CSV files in results/
+python report_build/build_pdf.py       # rebuilds the PDF from the notebook outputs and the figures
+```
+
+## Requirements
+
+Python 3 with `numpy`, `pandas`, `scipy`, `scikit-learn`, `statsmodels`, `matplotlib` (for the notebook) and `reportlab`, `Pillow` (for the report scripts). The project was developed and tested with numpy 2.4, pandas 3.0, scipy 1.17, scikit-learn 1.8, statsmodels 0.15, matplotlib 3.10 and reportlab 4.4.
+
+## References
+
+1. Dempster, A. P., Laird, N. M., and Rubin, D. B. (1977). Maximum likelihood from incomplete data via the EM algorithm. *Journal of the Royal Statistical Society: Series B*, 39(1), 1–38.
+2. Rubin, D. B. (1987). *Multiple Imputation for Nonresponse in Surveys*. Wiley.
+3. van Buuren, S. (2018). *Flexible Imputation of Missing Data*, 2nd ed. Chapman & Hall/CRC.

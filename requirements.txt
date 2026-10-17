@@ -1,6 +1,11 @@
+# Notebook
 numpy
 pandas
-matplotlib
 scipy
+scikit-learn
 statsmodels
+matplotlib
 jupyter
+# Report scripts (only needed to rebuild the PDF)
+reportlab
+Pillow
