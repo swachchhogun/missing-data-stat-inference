@@ -8,6 +8,8 @@ The data come from a model where the true answer is known (`Y = 5 + 2·X1 − 1.
 
 **Read the full report:** [`report/Missing_Data_Statistical_Inference_Report.pdf`](report/Missing_Data_Statistical_Inference_Report.pdf)
 
+**Study guide (the whole project explained from scratch, every figure explained, likely questions and answers):** [`report/Project_Explained_Step_by_Step.pdf`](report/Project_Explained_Step_by_Step.pdf)
+
 ## The question
 
 > Within each type of missingness, which way of handling the missing values gives the most accurate estimate, and which confidence intervals contain the true value about 95% of the time?
@@ -47,7 +49,9 @@ With 300 repetitions, a coverage near 95% is accurate to about ±2.5 points. Ful
 ## What is in this repository
 
 ```
-├── report/Missing_Data_Statistical_Inference_Report.pdf   the written report
+├── report/
+│   ├── Missing_Data_Statistical_Inference_Report.pdf      the written report
+│   └── Project_Explained_Step_by_Step.pdf                 study guide: everything explained from scratch
 ├── notebook/missing_data_simulation.ipynb                 all the code, step by step, with outputs
 ├── results/
 │   ├── monte_carlo_results.csv        every repetition, mechanism and method (estimate, SEs, percentile limits)
