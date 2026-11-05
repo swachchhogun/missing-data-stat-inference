@@ -1,0 +1,28 @@
+Mechanism,Method,Classical SE / SD,Bootstrap SE / SD,Rubin SE / SD
+MCAR,Full data,1.0076,1.0075,
+MCAR,Complete Case,0.9837,0.9828,
+MCAR,Mean Imputation,0.8931,0.9796,
+MCAR,Hot-Deck,0.7862,0.9855,
+MCAR,Regression Imputation,0.7401,0.9824,
+MCAR,Stochastic Regression,0.748,0.9351,
+MCAR,MICE (normal),,,0.9662
+MCAR,MICE (PMM),,,0.964
+MCAR,EM,,0.9811,
+MAR,Full data,1.0076,1.0075,
+MAR,Complete Case,0.9229,0.9218,
+MAR,Mean Imputation,0.9139,0.9334,
+MAR,Hot-Deck,0.708,0.9577,
+MAR,Regression Imputation,0.7095,0.9675,
+MAR,Stochastic Regression,0.7314,0.9542,
+MAR,MICE (normal),,,0.9705
+MAR,MICE (PMM),,,0.9044
+MAR,EM,,0.9586,
+MNAR,Full data,1.0076,1.0075,
+MNAR,Complete Case,0.9463,0.9444,
+MNAR,Mean Imputation,0.9363,0.9473,
+MNAR,Hot-Deck,0.7592,0.9621,
+MNAR,Regression Imputation,0.6778,0.93,
+MNAR,Stochastic Regression,0.7261,0.9396,
+MNAR,MICE (normal),,,0.9565
+MNAR,MICE (PMM),,,0.8328
+MNAR,EM,,0.9326,

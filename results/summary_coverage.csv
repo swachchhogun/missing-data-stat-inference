@@ -1,0 +1,28 @@
+Mechanism,Method,Classical,Bootstrap standard,Bootstrap percentile,Rubin
+MCAR,Full data,94.33,93.67,93.67,
+MCAR,Complete Case,95.0,93.67,92.33,
+MCAR,Mean Imputation,14.67,17.33,13.67,
+MCAR,Hot-Deck,73.0,85.0,84.33,
+MCAR,Regression Imputation,68.67,83.0,78.67,
+MCAR,Stochastic Regression,85.0,92.0,95.0,
+MCAR,EM,,93.33,92.67,
+MCAR,MICE (normal),,,,95.33
+MCAR,MICE (PMM),,,,94.0
+MAR,Full data,94.33,93.67,93.67,
+MAR,Complete Case,77.0,75.0,73.33,
+MAR,Mean Imputation,4.67,4.33,3.67,
+MAR,Hot-Deck,57.33,73.67,72.33,
+MAR,Regression Imputation,66.67,84.67,81.33,
+MAR,Stochastic Regression,82.33,94.67,94.67,
+MAR,EM,,93.0,92.67,
+MAR,MICE (normal),,,,94.0
+MAR,MICE (PMM),,,,87.0
+MNAR,Full data,94.33,93.67,93.67,
+MNAR,Complete Case,87.0,87.0,86.33,
+MNAR,Mean Imputation,4.33,4.0,4.0,
+MNAR,Hot-Deck,84.67,91.33,90.67,
+MNAR,Regression Imputation,41.67,61.33,57.33,
+MNAR,Stochastic Regression,75.0,87.33,88.33,
+MNAR,EM,,87.0,84.33,
+MNAR,MICE (normal),,,,89.0
+MNAR,MICE (PMM),,,,89.0
